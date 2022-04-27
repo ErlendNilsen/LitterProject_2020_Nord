@@ -1,4 +1,4 @@
-# Land cover type modulates the spatial distribution of garbage in a Nordic cultural landscape
+# Land cover type modulates the distribution of garbage in a Nordic cultural landscape
 *This repo contains code and data produced during a science project for MSc students at Nord University, Norway, as part of the BIO5020 Landscape Ecology and Nature Management class. The field work was carried out fall 2020, and the exercise resulted in a manuscript that is currently under consideration for publication in a scientific journal.* 
 
 ### Abstract 

@@ -185,13 +185,18 @@ Study_area_7b <- reclassify(Study_area_7, Reclass_edge, rigth=FALSE)
 ###############################################################################
 ### Setting the final size of study area; 
 
-
 Study_area_final_size <- rgeos::gBuffer(CampusNord, width=7000)
 
 ## Cropping the raster; 
 
 Study_area_final <- crop(Study_area_7b, Study_area_final_size)                # Crop by the extent of the Study area object
 #writeRaster(Study_area_final, "Study_area_Litter_Project", format="GTiff")
+
+## Cropping raster - no buffer zone
+
+Study_area_4b_final <- crop(Study_area_4b, Study_area_final_size)
+#writeRaster(Study_area_4b_final, "Study_area_Litter_Project_NoBufferZone", format="GTiff")
+
 
 
 

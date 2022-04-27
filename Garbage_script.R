@@ -20,9 +20,8 @@ library(gridExtra)
 library(wordcloud2)
 library(dplyr)
 library(gmodels)
+library(ggpubr)
 
-### Setting working directory ###
-getwd()
 
 ### Loading necessary data ###
 
@@ -31,8 +30,13 @@ d2 <- read_excel("Nord_LitterProject_2020.xlsx",sheet = "Items")
 
 
 ### Descriptive statistics ###
-table(d1$HabitatGT, d1$TrashDetected)
+table(d1$HabitatGT)
+table(d1$TrashDetected)
 
+table(d1$HabitatGT, d1$TrashDetected)
+min(d1$TrashAbundance)
+max(d1$TrashAbundance)
+sum(d1$TrashAbundance)
 
 
 ##########################################################################################
@@ -59,13 +63,25 @@ pred1 <- ggpredict(M1, terms="HabitatGT")
 p1 <- ggplot(data=pred1, aes(x, predicted)) +
   geom_linerange(aes(ymin = conf.low, ymax = conf.high), colour="dark grey", size= 1) + 
   geom_point(colour="dark blue", size=4) +
-  theme_minimal() + 
+  #theme_minimal() + 
   ylim(0,1) + 
   xlab("") +
-  ylab("Estimated garbage detection probability") +
-  theme(axis.text.x = element_text(angle=90, hjust=1, size=12))
+  ylab("Garbage detection prob.") 
 
-p1
+##  The "minimal" version
+p1 + theme_minimal() + 
+     theme(axis.text.x = element_text(angle=90, hjust=1, size=12), 
+           axis.text.y=element_text(size=12),
+           axis.title.y = element_text(size=14)) 
+     
+ggsave("figures/Figure2A.jpg", plot=last_plot(), width = 5, height = 5, dpi=500)
+
+##  The "minimal" version
+p1 +   theme(axis.text.x = element_text(angle=90, hjust=1, size=12), 
+        axis.text.y=element_text(size=12),
+        axis.title.y = element_text(size=14)) 
+
+ggsave("figures/Figure2A_alt.jpg", plot=last_plot(), width = 5, height = 5, dpi=500)
 
 
 ##########################################################################################
@@ -106,14 +122,23 @@ pred2 <- ggpredict(M3a, terms="HabitatGT")
 p2 <- ggplot(data=pred2, aes(x, predicted)) +
   geom_linerange(aes(ymin = conf.low, ymax = conf.high), colour="dark grey", size=1) +  
   geom_point(colour="dark blue", size=4) +
-  theme_minimal() +
   xlab("") +
-  ylab("Litter abundance") +
-  theme(axis.text.x = element_text(angle=90, hjust=1, size=12))
+  ylab("Litter abundance") 
 
-p2
+## Minimal theme
+p2 + theme_minimal() +
+      theme(axis.text.x = element_text(angle=90, hjust=1, size=14), 
+        axis.text.y=element_text(size=12),
+        axis.title.y = element_text(size=14)) 
 
+ggsave("figures/Figure2B.jpg", plot=last_plot(), width = 5, height = 5, dpi=500)
 
+## Normal theme
+p2 +    theme(axis.text.x = element_text(angle=90, hjust=1, size=14), 
+        axis.text.y=element_text(size=12),
+        axis.title.y = element_text(size=14)) 
+
+ggsave("figures/Figure2B_alt.jpg", plot=last_plot(), width = 5, height = 5, dpi=500)
 
 ##########################################################################################
 
@@ -149,14 +174,24 @@ pred3 <- ggpredict(M5c, terms=c("distRoad", "HabitatGT"))
 p3 <- ggplot(data=pred3, aes(x, predicted)) +
   geom_line(colour="dark blue", size=1.2) +
   facet_wrap(~group) +
-  theme_minimal() + 
   xlab("Distance to road (m)") +
-  ylab("Estimated garbage detection probability") +
+  ylab("Garbage detection probability") +
   ylim(0,1) + 
-  theme(axis.text.x = element_text(angle=0, hjust=1, size=12))+
+  
   geom_ribbon(aes(ymin = conf.low, ymax = conf.high),fill = "grey", alpha = 0.3)
 
-p3
+## Minimal
+p3 + theme_minimal() +
+     theme(axis.text.x = element_text(angle=0, hjust=1, size=12),
+           axis.title = element_text(size=14),
+           strip.text = element_text(size=14))
+ggsave("figures/Figure3.jpg", plot=last_plot(), width = 7, height = 5, dpi=500)
+
+## alternative
+p3 +   theme(axis.text.x = element_text(angle=0, hjust=1, size=12),
+        axis.title = element_text(size=14),
+        strip.text = element_text(size=14))
+ggsave("figures/Figure3_alt.jpg", plot=last_plot(), width = 7, height = 5, dpi=500)
 
 
 ##########################################################################################
@@ -207,74 +242,113 @@ pred4b <- ggpredict(M6b, terms="HabitatGT") %>%
 p4 <- ggplot(data=pred4b, aes(x, predicted)) +
   geom_linerange(aes(ymin = conf.low, ymax = conf.high), colour="dark grey", size=1) +
   geom_point(colour="dark blue", size=4) +
-  theme_minimal() + 
-  xlab("Land cover type") +
+  xlab("") +
   ylab("Litter size (cm)") +
-  theme(axis.text.x = element_text(angle=90, hjust=1, size=12)) + 
   ylim(0,65)
 
+## Minimal
+p4 + theme_minimal() +
+  theme(axis.text.x = element_text(angle=90, hjust=1, size=14), 
+        axis.text.y=element_text(size=12),
+        axis.title.y = element_text(size=14)) 
+ggsave("figures/Figure2C.jpg", plot=last_plot(), width = 5, height = 5, dpi=500)
 
-p4
+## Normal
+## Minimal
+p4 +   theme(axis.text.x = element_text(angle=90, hjust=1, size=14), 
+        axis.text.y=element_text(size=12),
+        axis.title.y = element_text(size=14)) 
+ggsave("figures/Figure2C_alt.jpg", plot=last_plot(), width = 5, height = 5, dpi=500)
 
-grid.arrange(p1,p2,p4, nrow = 3)
+######################################################################################
+#### Combining figure 2A - C into one figure file
+
+## Minimal
+p2_all <- ggarrange(p1 +   theme_minimal() + theme(axis.text.x = element_text(angle=60, hjust=1, size=14), 
+                          axis.text.y=element_text(size=12),
+                          axis.title.y = element_text(size=12)), 
+             p2 +  theme_minimal() + theme(axis.text.x = element_text(angle=60, hjust=1, size=14), 
+                          axis.text.y=element_text(size=12),
+                          axis.title.y = element_text(size=12)), 
+             p4 +  theme_minimal() + theme(axis.text.x = element_text(angle=60, hjust=1, size=14), 
+                          axis.text.y=element_text(size=12),
+                          axis.title.y = element_text(size=12)), 
+             nrow = 3, labels = c("A)", "B)", "C)"), hjust=-3)
+ggsave("figures/Figure2.jpg", p2_all, width = 8, height = 9, dpi=500)
+
+## Normal
+p2_all <- ggarrange(p1 +   theme(axis.text.x = element_text(angle=60, hjust=1, size=14), 
+                                         axis.text.y=element_text(size=12),
+                                         axis.title.y = element_text(size=12)), 
+                            p2 +  theme(axis.text.x = element_text(angle=60, hjust=1, size=14), 
+                                        axis.text.y=element_text(size=12),
+                                        axis.title.y = element_text(size=12)), 
+                            p4 +  theme(axis.text.x = element_text(angle=60, hjust=1, size=14), 
+                                        axis.text.y=element_text(size=12),
+                                        axis.title.y = element_text(size=12)), 
+                            nrow = 3, labels = c("A)", "B)", "C)"), hjust=-3)
+
+ggsave("figures/Figure2_alt.jpg", p2_all, width = 8, height = 9, dpi=500)
 
 
 ##########################################################################################
+##########################################################################################
+#### HYPOTHESIS 2 - chi.sq and WORDCLOUDS ####
 
+d3 <- d2 %>% left_join(., d1) %>%
+  group_by(HabitatGT) %>%
+  count(MatClass) %>%
+  rename("Antall"="n")
 
-#### HYPOTHESIS 2 WORDCLOUDS ####
+### CONTINGENCY TABLES ###
+# Rare material classes were assigned to the material type "other" 
+agg <- subset(d3, MatClass=="clay" | MatClass=="paint" | MatClass=="wood" | MatClass=="other composite" | MatClass=="glass")
 
+c <- aggregate(agg$Antall, by=list(agg$HabitatGT), FUN=sum)
+c1 <- c %>% rename(HabitatGT = Group.1, Antall = x)
+c1$MatClass <- c("other", "other", "other", "other", "other", "other", "other")
 
+c2 <- subset(d3, subset=!(MatClass=="clay" | MatClass=="paint" | MatClass=="wood" | MatClass=="other composite" | MatClass=="glass"))
 
-### First - we are plotting the different item types (column "Description"in raw data) ###
+ctest2 <- rbind(c2, c1)
+
+# Generating a cross tab and chisquare test
+mytable <- xtabs(Antall~HabitatGT+MatClass, data=ctest2)
+CrossTable(mytable, expected=T, chisq=T, simulate.p.value = FALSE)
+
+##############################################################################################
+##############################################################################################
+
+### Wordcloud 1 Type of item ###
 
 ## Preparing data
 test <- d2 %>% left_join(., d1) %>%
   group_by(HabitatGT) %>%
   count(Description) %>%
-  rename("Antall"="n")
-
-sum(test$Antall) # 932 items 
-
-## Plotting
-set.seed(123)
-
-p5 <- ggplot(test, aes(label = Description, size=Antall, color='white')) +
-  geom_text_wordcloud() + 
-  scale_size_area(max_size=10) +
-  #theme_dark() +
-  facet_wrap(~HabitatGT)
-
-p5
-
-
-##############################################################################################
-
-### Wordcloud 1 Type of item ###
-
+  rename("Antall"="n") %>%
+  as.data.frame()
 
 # Convert test to dataframe to allow subsetting in ggplot2
-test2 <- as.data.frame(test) 
+#test2 <- as.data.frame(test) 
 
 # Create an "angle" column to rotate some of the words, rotate 40 percent
-test2_with_rotated <- test2 %>%
+test_with_rotated <- test %>%
   mutate(angle = 90 * sample(c(0, 1), n(), replace = TRUE, prob = c(60, 40)))
 
 # Dont rotate the largest words
-test2_with_rotated$angle <- ifelse(test2_with_rotated$Antall > 5,
-                                   0,
-                                   test2_with_rotated$angle)
+test_with_rotated$angle <- ifelse(test_with_rotated$Antall > 5,
+                                  0,
+                                  test_with_rotated$angle)
 
 
 used_theme <- theme_minimal() 
 used_scale_radius <- scale_radius(range = c(0, 8), limits = c(0, 5)) 
 #
-str(test2_with_rotated)
 
-test2_with_rotated$log_transformed <- log(test2_with_rotated$Antall) + 1
+test_with_rotated$log_transformed <- log(test_with_rotated$Antall) + 1
 
 set.seed(123)
-g1  <- ggplot(subset(test2_with_rotated, HabitatGT %in% "agriculture"),aes(label = Description, size=log_transformed,angle = angle,color = factor(sample.int(10,6)))) +
+g1  <- ggplot(subset(test_with_rotated, HabitatGT %in% "agriculture"),aes(label = Description, size=log_transformed,angle = angle,color = factor(sample.int(10,6)))) +
   geom_text_wordcloud() + 
   scale_radius(range = c(0, 25), limits = c(0, 5)) + 
   used_theme +
@@ -284,7 +358,7 @@ g1  <- ggplot(subset(test2_with_rotated, HabitatGT %in% "agriculture"),aes(label
 g1
 
 set.seed(123)
-g2 <- ggplot(subset(test2_with_rotated, HabitatGT %in% "beach"),aes(label = Description, size=log_transformed,angle = angle,color = factor(sample.int(10, 34, replace = TRUE)))) +
+g2 <- ggplot(subset(test_with_rotated, HabitatGT %in% "beach"),aes(label = Description, size=log_transformed,angle = angle,color = factor(sample.int(10, 34, replace = TRUE)))) +
   geom_text_wordcloud() + 
   scale_radius(range = c(0, 35), limits = c(0, 10)) +
   used_theme +
@@ -294,7 +368,7 @@ g2 <- ggplot(subset(test2_with_rotated, HabitatGT %in% "beach"),aes(label = Desc
 g2
 
 set.seed(123)
-g3 <- ggplot(subset(test2_with_rotated, HabitatGT %in% "edge"),aes(label = Description, size=log_transformed,angle = angle,color = factor(sample.int(10, 8, replace = TRUE)))) +
+g3 <- ggplot(subset(test_with_rotated, HabitatGT %in% "edge"),aes(label = Description, size=log_transformed,angle = angle,color = factor(sample.int(10, 8, replace = TRUE)))) +
   geom_text_wordcloud() + 
   scale_radius(range = c(0, 30), limits = c(0, 5)) +
   used_theme +
@@ -304,7 +378,7 @@ g3 <- ggplot(subset(test2_with_rotated, HabitatGT %in% "edge"),aes(label = Descr
 g3
 
 set.seed(123)
-g4 <- ggplot(subset(test2_with_rotated, HabitatGT %in% "forest"),aes(label = Description, size=log_transformed,angle = angle,color = factor(sample.int(10, 8, replace = TRUE)))) +
+g4 <- ggplot(subset(test_with_rotated, HabitatGT %in% "forest"),aes(label = Description, size=log_transformed,angle = angle,color = factor(sample.int(10, 8, replace = TRUE)))) +
   geom_text_wordcloud() + 
   scale_radius(range = c(0, 25), limits = c(0, 5)) +
   used_theme +
@@ -314,7 +388,7 @@ g4 <- ggplot(subset(test2_with_rotated, HabitatGT %in% "forest"),aes(label = Des
 g4
 
 set.seed(123)
-g5 <- ggplot(subset(test2_with_rotated, HabitatGT %in% "lakeshore"),aes(label = Description, size=log_transformed,angle = angle,color = factor(sample.int(10, 39, replace = TRUE)))) +
+g5 <- ggplot(subset(test_with_rotated, HabitatGT %in% "lakeshore"),aes(label = Description, size=log_transformed,angle = angle,color = factor(sample.int(10, 39, replace = TRUE)))) +
   geom_text_wordcloud() + 
   scale_radius(range = c(0, 10), limits = c(0, 2)) +
   used_theme +
@@ -324,7 +398,7 @@ g5 <- ggplot(subset(test2_with_rotated, HabitatGT %in% "lakeshore"),aes(label = 
 g5
 
 set.seed(123)
-g6 <- ggplot(subset(test2_with_rotated, HabitatGT %in% "river"),aes(label = Description, size=log_transformed,angle = angle,color = factor(sample.int(10, 28, replace = TRUE)))) +
+g6 <- ggplot(subset(test_with_rotated, HabitatGT %in% "river"),aes(label = Description, size=log_transformed,angle = angle,color = factor(sample.int(10, 28, replace = TRUE)))) +
   geom_text_wordcloud() + 
   scale_radius(range = c(0, 14), limits = c(0, 2)) +
   used_theme +
@@ -334,7 +408,7 @@ g6 <- ggplot(subset(test2_with_rotated, HabitatGT %in% "river"),aes(label = Desc
 g6
 
 set.seed(123)
-g7 <- ggplot(subset(test2_with_rotated, HabitatGT %in% "road"),aes(label = Description, size=log_transformed,angle = angle,color = factor(sample.int(10, 39, replace = TRUE)))) +
+g7 <- ggplot(subset(test_with_rotated, HabitatGT %in% "road"),aes(label = Description, size=log_transformed,angle = angle,color = factor(sample.int(10, 39, replace = TRUE)))) +
   geom_text_wordcloud() + 
   scale_radius(range = c(0, 16), limits = c(0, 2)) +
   used_theme +
@@ -344,7 +418,7 @@ g7 <- ggplot(subset(test2_with_rotated, HabitatGT %in% "road"),aes(label = Descr
 g7
 
 set.seed(123)
-g8 <- ggplot(subset(test2_with_rotated, HabitatGT %in% "urban"),aes(label = Description, size=log_transformed,angle = angle,color = factor(sample.int(10, 26, replace = TRUE)))) +
+g8 <- ggplot(subset(test_with_rotated, HabitatGT %in% "urban"),aes(label = Description, size=log_transformed,angle = angle,color = factor(sample.int(10, 26, replace = TRUE)))) +
   geom_text_wordcloud() + 
   scale_radius(range = c(0, 16), limits = c(0, 2)) +
   used_theme +
@@ -353,7 +427,7 @@ g8 <- ggplot(subset(test2_with_rotated, HabitatGT %in% "urban"),aes(label = Desc
 
 g8
 
-totaldata <- aggregate(test2_with_rotated$Antall, by=list(Description=test2_with_rotated$Description), FUN=sum)
+totaldata <- aggregate(test_with_rotated$Antall, by=list(Description=test2_with_rotated$Description), FUN=sum)
 
 ## Rotate 60 percent of the words, 90 degrees
 
@@ -376,29 +450,31 @@ g9 <- ggplot(totaldata,aes(label = Description, size=log_transformed,angle = ang
 
 g9
 
-grid.arrange(g1,g2,g3,g4,g5,g6,g7,g8,g9, nrow = 3)
+p8 <- grid.arrange(g1,g2,g3,g4,g5,g6,g7,g8,g9, nrow = 3)
+ggsave("figures/Wordcloud_Appendix.jpg", p8, width = 12, height = 12, dpi=500)
 
 
 ##################################################################################
-
+##################################################################################
 ### Wordcloud 2 Material type ###
 
 test2 <- d2 %>% left_join(., d1) %>%
   group_by(HabitatGT) %>%
   count(MatClass) %>%
-  rename("Antall"="n")
+  rename("Antall"="n") %>%
+  as.data.frame()
 
 # Convert test to dataframe to allow subsetting in ggplot2
-test123 <- as.data.frame(test2) 
+#test123 <- as.data.frame(test2) 
 
 # Create an "angle" column to rotate some of the words, rotate 40 percent
-test5_rotated <- test123 %>%
+test2_rotated <- test2 %>%
   mutate(angle = 90 * sample(c(0, 1), n(), replace = TRUE, prob = c(60, 40)))  
 
 # Dont rotate the largest words
-test5_rotated$angle <- ifelse(test5_rotated$Antall > 5,
+test2_rotated$angle <- ifelse(test2_rotated$Antall > 5,
                               0,
-                              test5_rotated$angle)
+                              test2_rotated$angle)
 
 
 used_theme <- theme_minimal() 
@@ -407,151 +483,106 @@ used_scale_radius <- scale_radius(range = c(0, 8), limits = c(0, 5))
 used_theme <- theme_minimal() 
 used_scale_radius <- scale_radius(range = c(0, 8), limits = c(0, 5)) 
 #
-str(test5_rotated)
 
 # log test
-test5_rotated$log_transformed <- log(test5_rotated$Antall) + 1
+test2_rotated$log_transformed <- log(test2_rotated$Antall) + 1
 
 set.seed(123)
-A1 <- ggplot(subset(test5_rotated, HabitatGT %in% "agriculture" ), aes(label = MatClass,size=Antall, angle = angle,color = factor(sample.int(10,3)))) +
+A1 <- ggplot(subset(test2_rotated, HabitatGT %in% "agriculture" ), aes(label = MatClass,size=log_transformed, angle = angle,color = factor(sample.int(10,3)))) +
   geom_text_wordcloud() + 
-  scale_radius(range = c(0, 60), limits = c(0, 12)) + 
+  scale_radius(range = c(0, 50), limits = c(0, 12)) + 
   used_theme +
   ggtitle("Agriculture") +
-  theme(plot.title = element_text(hjust = 0.5, size =32))
+  theme(plot.title = element_text(hjust = 0.5, size =25))
 A1
 
 set.seed(123)
-A2  <- ggplot(subset(test5_rotated, HabitatGT %in% "beach"),aes(label = MatClass, size=log_transformed,angle = angle,color = factor(sample.int(10,7)))) +
+A2  <- ggplot(subset(test2_rotated, HabitatGT %in% "beach"),aes(label = MatClass, size=log_transformed,angle = angle,color = factor(sample.int(10,7)))) +
   geom_text_wordcloud() + 
-  scale_radius(range = c(0, 90), limits = c(0, 12)) + 
+  scale_radius(range = c(0, 40), limits = c(0, 12)) + 
   used_theme +
   ggtitle("Beach") +
-  theme(plot.title = element_text(hjust = 0.5, size =32)) 
+  theme(plot.title = element_text(hjust = 0.5, size =25)) 
 
 A2
 
 set.seed(123)
-A3 <- ggplot(subset(test5_rotated, HabitatGT %in% "edge"),aes(label = MatClass, size=log_transformed,angle = angle,color = factor(sample.int(10, 3, replace = TRUE)))) +
+A3 <- ggplot(subset(test2_rotated, HabitatGT %in% "edge"),aes(label = MatClass, size=log_transformed,angle = angle,color = factor(sample.int(10, 3, replace = TRUE)))) +
   geom_text_wordcloud() + 
-  scale_radius(range = c(0, 100), limits = c(0, 12)) +
+  scale_radius(range = c(0, 40), limits = c(0, 12)) +
   used_theme +
   ggtitle("Edge") +
-  theme(plot.title = element_text(hjust = 0.5, size =32))
+  theme(plot.title = element_text(hjust = 0.5, size =25))
 
 A3
 
 set.seed(123)
-A4 <- ggplot(subset(test5_rotated, HabitatGT %in% "forest"),aes(label = MatClass, size=log_transformed,angle = angle,color = factor(sample.int(10, 3, replace = TRUE)))) +
+A4 <- ggplot(subset(test2_rotated, HabitatGT %in% "forest"),aes(label = MatClass, size=log_transformed,angle = angle,color = factor(sample.int(10, 3, replace = TRUE)))) +
   geom_text_wordcloud() + 
-  scale_radius(range = c(0, 60), limits = c(0, 12)) +
+  scale_radius(range = c(0, 50), limits = c(0, 12)) +
   used_theme +
   ggtitle("Forest") +
-  theme(plot.title = element_text(hjust = 0.5, size =32))
+  theme(plot.title = element_text(hjust = 0.5, size =25))
 
 A4
 
 set.seed(123)
-A5 <- ggplot(subset(test5_rotated, HabitatGT %in% "lakeshore"),aes(label = MatClass, size=log_transformed,angle = angle,color = factor(sample.int(10, 5, replace = TRUE)))) +
+A5 <- ggplot(subset(test2_rotated, HabitatGT %in% "lakeshore"),aes(label = MatClass, size=log_transformed,angle = angle,color = factor(sample.int(10, 5, replace = TRUE)))) +
   geom_text_wordcloud() + 
-  scale_radius(range = c(0, 90), limits = c(0, 12)) +
+  scale_radius(range = c(0, 40), limits = c(0, 12)) +
   used_theme +
   ggtitle("Lakeshore") +
-  theme(plot.title = element_text(hjust = 0.5, size =32))
+  theme(plot.title = element_text(hjust = 0.5, size =25))
 
 A5
 
 set.seed(123)
-A6 <- ggplot(subset(test5_rotated, HabitatGT %in% "river"),aes(label = MatClass, size=log_transformed,angle = angle,color = factor(sample.int(10, 5, replace = TRUE)))) +
+A6 <- ggplot(subset(test2_rotated, HabitatGT %in% "river"),aes(label = MatClass, size=log_transformed,angle = angle,color = factor(sample.int(10, 5, replace = TRUE)))) +
   geom_text_wordcloud() + 
-  scale_radius(range = c(0, 70), limits = c(0, 8)) +
+  scale_radius(range = c(0, 40), limits = c(0, 8)) +
   used_theme +
   ggtitle("River") +
-  theme(plot.title = element_text(hjust = 0.5, size =32))
+  theme(plot.title = element_text(hjust = 0.5, size =25))
 
 A6
 
 set.seed(123)
-A7 <- ggplot(subset(test5_rotated, HabitatGT %in% "road"),aes(label = MatClass, size=log_transformed,angle = angle,color = factor(sample.int(10, 6, replace = TRUE)))) +
+A7 <- ggplot(subset(test2_rotated, HabitatGT %in% "road"),aes(label = MatClass, size=log_transformed,angle = angle,color = factor(sample.int(10, 6, replace = TRUE)))) +
   geom_text_wordcloud() + 
-  scale_radius(range = c(0, 50), limits = c(0, 8)) +
+  scale_radius(range = c(0, 30), limits = c(0, 8)) +
   used_theme +
   ggtitle("Road") +
-  theme(plot.title = element_text(hjust = 0.5, size =32))
+  theme(plot.title = element_text(hjust = 0.5, size =25))
 
 A7
 
 set.seed(123)
-A8 <- ggplot(subset(test5_rotated, HabitatGT %in% "urban"),aes(label = MatClass, size=log_transformed,angle = angle,color = factor(sample.int(10, 4, replace = TRUE)))) +
+A8 <- ggplot(subset(test2_rotated, HabitatGT %in% "urban"),aes(label = MatClass, size=log_transformed,angle = angle,color = factor(sample.int(10, 4, replace = TRUE)))) +
   geom_text_wordcloud() + 
-  scale_radius(range = c(0, 70), limits = c(0, 8)) +
+  scale_radius(range = c(0, 40), limits = c(0, 8)) +
   used_theme +
   ggtitle("Urban") +
-  theme(plot.title = element_text(hjust = 0.5, size =32))
+  theme(plot.title = element_text(hjust = 0.5, size =25))
 
 A8
 
-totaldata <- aggregate(test5_rotated$log_transformed, by=list(Description=test5_rotated$MatClass), FUN=sum)
+totaldata2 <- aggregate(test2_rotated$log_transformed, by=list(Description=test5_rotated$MatClass), FUN=sum)
 
-totaldata <- totaldata %>%
+totaldata2 <- totaldata2 %>%
   mutate(angle = 90 * sample(c(0, 1), n(), replace = TRUE, prob = c(60, 40)))
 
-totaldata$angle <- ifelse(totaldata$x > 5,
-                          0,
-                          totaldata$angle)
+totaldata2$angle <- ifelse(totaldata2$x > 5,
+                           0,
+                           totaldata2$angle)
 set.seed(123)
-A9 <- ggplot(totaldata,aes(label = Description, size=x,angle = angle,color = factor(sample.int(10, 8, replace = TRUE)))) +
+A9 <- ggplot(totaldata2,aes(label = Description, size=x,angle = angle,color = factor(sample.int(10, 8, replace = TRUE)))) +
   geom_text_wordcloud() + 
-  scale_radius(range = c(0, 50), limits = c(0, 50)) +
+  scale_radius(range = c(0, 30), limits = c(0, 50)) +
   used_theme +
   ggtitle("Total") +
-  theme(plot.title = element_text(hjust = 0.5, size =32))
+  theme(plot.title = element_text(hjust = 0.5, size =25)) 
 A9
 
-grid.arrange(A1, A2, A3, A4, A5, A6, A7, A8, A9, nrow = 3)
-
-
-
-##########################################################################
-
-
-### CONTINGENCY TABLES ###
-
-test2
-test2$MatClass
-
-# Rare material classes were assigned to the material type "other" 
-agg <- subset(test2, MatClass=="clay" | MatClass=="paint" | MatClass=="wood" | MatClass=="other composite" | MatClass=="glass")
-agg
-
-c <- aggregate(agg$Antall, by=list(agg$HabitatGT), FUN=sum)
-c
-
-c1 <- c %>% rename(HabitatGT = Group.1, Antall = x)
-c1
-
-c1$MatClass <- c("other", "other", "other", "other", "other", "other", "other")
-c1
-
-c2 <- subset(test2, subset=!(MatClass=="clay" | MatClass=="paint" | MatClass=="wood" | MatClass=="other composite" | MatClass=="glass"))
-c2
-
-ctest2 <- rbind(c2, c1)
-ctest2
-
-# Generating a cross tab and chisquare test
-mytable <- xtabs(Antall~HabitatGT+MatClass, data=ctest2)
-mytable
-
-CrossTable(mytable, expected=T, chisq=T, simulate.p.value = FALSE)
-
-
-
-
-
-
-
-
-
-
+p9 <- grid.arrange(A1, A2, A3, A4, A5, A6, A7, A8, A9, nrow = 3)
+ggsave("figures/Figure4.jpg", p9, width = 12, height = 12, dpi=500)
 
